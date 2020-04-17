@@ -28,15 +28,29 @@ const DrumMachine = () => {
   return (
     <div className="DrumMachine">
       <div className="PadController">
-        <div className="DrumMachine-logo">
-          <strong>DRUM</strong>MACHINE
-        </div>
-        {audioContext.clips.map((clip, i) => (
-          <React.Fragment key={i}>
-            <Pad clip={clip} />
-            {(i + 1) % 4 === 0 && <br />}
-          </React.Fragment>
-        ))}
+        {audioContext.loading ? (
+          <>
+            <div className="DrumMachine-logo">LOADING</div>
+            {audioContext.clips.map((clip, i) => (
+              <React.Fragment key={i}>
+                <Pad clip={""} />
+                {(i + 1) % 4 === 0 && <br />}
+              </React.Fragment>
+            ))}
+          </>
+        ) : (
+          <>
+            <div className="DrumMachine-logo">
+              <strong>DRUM</strong>MACHINE
+            </div>
+            {audioContext.clips.map((clip, i) => (
+              <React.Fragment key={i}>
+                <Pad clip={clip} />
+                {(i + 1) % 4 === 0 && <br />}
+              </React.Fragment>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

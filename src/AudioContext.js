@@ -34,6 +34,7 @@ const playSound = (clip, start = 0) => {
 };
 
 const AudioContextProvider = ({ children }) => {
+  const [loading, setLoading] = useState(true);
   const [tempo, setTempo] = useState(90);
   const sequence = {
     hihat: [
@@ -92,18 +93,23 @@ const AudioContextProvider = ({ children }) => {
     ],
   };
   useEffect(() => {
+    setLoading(true);
+    let loadClips = [];
     for (let clip of clips) {
-      axios
-        .get(process.env.PUBLIC_URL + `/clips/${clip}.wav`, {
-          responseType: "arraybuffer",
-        })
-        .then((result) => {
-          return _audioContext.decodeAudioData(result.data);
-        })
-        .then((result) => {
-          audioData[clip] = result;
-        });
+      loadClips.push(
+        axios
+          .get(process.env.PUBLIC_URL + `/clips/${clip}.wav`, {
+            responseType: "arraybuffer",
+          })
+          .then((result) => {
+            return _audioContext.decodeAudioData(result.data);
+          })
+          .then((result) => {
+            audioData[clip] = result;
+          })
+      );
     }
+    Promise.all(loadClips).then(() => setLoading(false));
   }, []);
 
   const playSequence = () => {
@@ -118,7 +124,15 @@ const AudioContextProvider = ({ children }) => {
 
   return (
     <ReactAudioContext.Provider
-      value={{ _audioContext, tempo, setTempo, clips, playSound, playSequence }}
+      value={{
+        _audioContext,
+        loading,
+        tempo,
+        setTempo,
+        clips,
+        playSound,
+        playSequence,
+      }}
     >
       {children}
     </ReactAudioContext.Provider>
