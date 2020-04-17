@@ -36,3 +36,21 @@
     transform: rotate(360deg);
   }
 }
+
+.Pad {
+  height: 150px;
+  width: 150px;
+  text-align: center;
+  border: 1px solid black;
+  border-radius: 5px;
+  margin: 15px;
+  padding: 15px;
+  background-color: #282c34;
+  color: #fafafa;
+  box-shadow: -2px 2px 0px 0px rgb(0, 0, 0);
+  outline: none;
+}
+
+.Pad:active {
+  box-shadow: -4px 4px 0px 0px rgb(204, 1, 1);
+}
