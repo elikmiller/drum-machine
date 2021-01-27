@@ -17,27 +17,69 @@ class DrumMachine {
     this.scheduleAheadTime = 0.1; // How far ahead to schedule audio (s)
     this.nextNoteTime = 0.0; // when the next note is due.
     this.noteLength = 0.05; // length of "beep" (in seconds)
-    this.notesInQueue = []; // the notes that have been put into the web audio, and may or may not have played yet. {note, time}
     this.timerID = null; // setInterval id
-    this.pattern = [
-      true,
-      false,
-      false,
-      false,
-      true,
-      false,
-      false,
-      false,
-      true,
-      false,
-      false,
-      false,
-      true,
-      false,
-      false,
-      false,
-    ];
-    this.options = options;
+    this.pattern = {
+      261.63: [
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+      ],
+      329.63: [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+      ],
+      493.88: [
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+      ],
+    };
+
+    // callbacks
+    this.onTempoChange = options.onTempoChange;
+    this.onIsPlayingChange = options.onIsPlayingChange;
+    this.onNotePlayed = options.onNotePlayed;
+    this.onPatternChange = options.onPatternChange;
   }
 
   nextNote() {
@@ -50,21 +92,24 @@ class DrumMachine {
     if (this.current16thNote === 16) {
       this.current16thNote = 0;
     }
-    this.options.onNotePlayed(this.current16thNote);
+    this.onNotePlayed(this.current16thNote);
   }
 
-  scheduleNote(beatNumber, time, frequency = 440) {
-    // push the note on the queue, even if we're not playing.
-    this.notesInQueue.push({ note: beatNumber, time: time });
+  scheduleNote(beatNumber, time) {
+    for (let note in this.pattern) {
+      if (!this.pattern[note][beatNumber]) continue;
 
-    if (!this.pattern[beatNumber]) return;
+      // create an oscillator
+      var osc = this.audioContext.createOscillator();
+      let gainNode = this.audioContext.createGain();
+      gainNode.gain.value = 0.3;
+      osc.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
 
-    // create an oscillator
-    var osc = this.audioContext.createOscillator();
-    osc.connect(this.audioContext.destination);
-    osc.frequency.value = frequency;
-    osc.start(time);
-    osc.stop(time + this.noteLength);
+      osc.frequency.value = parseFloat(note);
+      osc.start(time);
+      osc.stop(time + this.noteLength);
+    }
   }
 
   scheduler() {
@@ -81,12 +126,12 @@ class DrumMachine {
 
   setTempo(tempo) {
     this.tempo = tempo;
-    this.options.onTempoChange(this.tempo);
+    this.onTempoChange(this.tempo);
   }
 
   setPattern(pattern) {
     this.pattern = pattern;
-    this.options.onPatternChange(this.pattern);
+    this.onPatternChange(this.pattern);
   }
 
   startStop() {
@@ -104,7 +149,7 @@ class DrumMachine {
     if (this.isPlaying) {
       // start playing
       this.current16thNote = 0;
-      this.options.onNotePlayed(0);
+      this.onNotePlayed(0);
       this.nextNoteTime = this.audioContext.currentTime;
       this.timerID = setInterval(() => this.scheduler(), this.lookahead);
     } else {
@@ -112,7 +157,7 @@ class DrumMachine {
       this.timerID = null;
     }
 
-    this.options.onIsPlayingChange(this.isPlaying);
+    this.onIsPlayingChange(this.isPlaying);
   }
 }
 
