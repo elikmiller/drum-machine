@@ -1,13 +1,13 @@
 import React from "react";
-import AudioContextProvider from "./providers/AudioContext";
-import DrumMachine from "./components/DrumMachine";
-import "./App.css";
+import DrumMachineContainer from "./components/DrumMachineContainer";
 
 const App = () => {
   return (
-    <AudioContextProvider>
-      <DrumMachine />
-    </AudioContextProvider>
+    <div className="uk-container uk-container-small">
+      <div className="uk-margin-auto">
+        <DrumMachineContainer />
+      </div>
+    </div>
   );
 };
 

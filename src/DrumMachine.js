@@ -1,3 +1,5 @@
+import axios from "axios";
+
 class DrumMachine {
   constructor(
     options = {
@@ -5,6 +7,7 @@ class DrumMachine {
       onIsPlayingChange: () => {},
       onNotePlayed: () => {},
       onPatternChange: () => {},
+      onLoadingDone: () => {},
     }
   ) {
     this.audioContext = new AudioContext();
@@ -19,60 +22,14 @@ class DrumMachine {
     this.noteLength = 0.05; // length of "beep" (in seconds)
     this.timerID = null; // setInterval id
     this.pattern = {
-      261.63: [
-        true,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-      ],
-      329.63: [
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        false,
-      ],
-      493.88: [
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-      ],
+      kick: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      snare: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      tom_low: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      tom_mid: [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      tom_high: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+      hihat_closed: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+      hihat_open: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+      crash: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     };
 
     // callbacks
@@ -80,6 +37,31 @@ class DrumMachine {
     this.onIsPlayingChange = options.onIsPlayingChange;
     this.onNotePlayed = options.onNotePlayed;
     this.onPatternChange = options.onPatternChange;
+    this.onLoadingDone = options.onLoadingDone;
+
+    // sounds
+    this.loading = true;
+    this.audioData = {};
+    let tracks = ["kick", "snare", "tom_low", "tom_mid", "tom_high", "hihat_closed", "hihat_open", "crash"];
+    let loadTracks = [];
+    for (let track of tracks) {
+      loadTracks.push(
+        axios
+          .get(process.env.PUBLIC_URL + `/clips/${track}.wav`, {
+            responseType: "arraybuffer",
+          })
+          .then((result) => {
+            return this.audioContext.decodeAudioData(result.data);
+          })
+          .then((result) => {
+            this.audioData[track] = result;
+          })
+      );
+    }
+    Promise.all(loadTracks).then(() => {
+      this.loading = false;
+      this.onLoadingDone();
+    });
   }
 
   nextNote() {
@@ -96,29 +78,19 @@ class DrumMachine {
   }
 
   scheduleNote(beatNumber, time) {
-    for (let note in this.pattern) {
-      if (!this.pattern[note][beatNumber]) continue;
-
-      // create an oscillator
-      var osc = this.audioContext.createOscillator();
-      let gainNode = this.audioContext.createGain();
-      gainNode.gain.value = 0.3;
-      osc.connect(gainNode);
-      gainNode.connect(this.audioContext.destination);
-
-      osc.frequency.value = parseFloat(note);
-      osc.start(time);
-      osc.stop(time + this.noteLength);
+    for (let track in this.pattern) {
+      if (!this.pattern[track][beatNumber]) continue;
+      let source = this.audioContext.createBufferSource();
+      source.buffer = this.audioData[track];
+      source.connect(this.audioContext.destination);
+      source.start(time);
     }
   }
 
   scheduler() {
     // while there are notes that will need to play before the next interval,
     // schedule them and advance the pointer.
-    while (
-      this.nextNoteTime <
-      this.audioContext.currentTime + this.scheduleAheadTime
-    ) {
+    while (this.nextNoteTime < this.audioContext.currentTime + this.scheduleAheadTime) {
       this.scheduleNote(this.current16thNote, this.nextNoteTime);
       this.nextNote();
     }
@@ -136,21 +108,17 @@ class DrumMachine {
 
   startStop() {
     if (!this.unlocked) {
-      // play silent buffer to unlock the audio
-      var buffer = this.audioContext.createBuffer(1, 1, 22050);
-      var node = this.audioContext.createBufferSource();
-      node.buffer = buffer;
-      node.start(0);
       this.unlocked = true;
+      this.audioContext.resume();
     }
 
     this.isPlaying = !this.isPlaying;
 
+    console.log(this.isPlaying);
+
     if (this.isPlaying) {
-      // start playing
       this.current16thNote = 0;
-      this.onNotePlayed(0);
-      this.nextNoteTime = this.audioContext.currentTime;
+      this.nextNoteTime = this.audioContext.currentTime + 0.1;
       this.timerID = setInterval(() => this.scheduler(), this.lookahead);
     } else {
       clearInterval(this.timerID);
