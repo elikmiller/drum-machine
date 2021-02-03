@@ -22,14 +22,22 @@ class DrumMachine {
     this.noteLength = 0.05; // length of "beep" (in seconds)
     this.timerID = null; // setInterval id
     this.pattern = {
-      kick: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      snare: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      tom_low: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      tom_mid: [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      tom_high: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-      hihat_closed: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-      hihat_open: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-      crash: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+      clap: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      clave: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      conga_hi: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      conga_mid: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      conga_low: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      cowbell: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      cymbal: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      hihat_closed: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      hihat_open: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      kick: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      maracas: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      rim: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      snare: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      tom_hi: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      tom_mid: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+      tom_low: [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
     };
 
     // callbacks
@@ -42,12 +50,29 @@ class DrumMachine {
     // sounds
     this.loading = true;
     this.audioData = {};
-    let tracks = ["kick", "snare", "tom_low", "tom_mid", "tom_high", "hihat_closed", "hihat_open", "crash"];
+    let tracks = [
+      "clap",
+      "clave",
+      "conga_hi",
+      "conga_mid",
+      "conga_low",
+      "cowbell",
+      "cymbal",
+      "hihat_closed",
+      "hihat_open",
+      "kick",
+      "maracas",
+      "rim",
+      "snare",
+      "tom_hi",
+      "tom_mid",
+      "tom_low",
+    ];
     let loadTracks = [];
     for (let track of tracks) {
       loadTracks.push(
         axios
-          .get(process.env.PUBLIC_URL + `/clips/${track}.wav`, {
+          .get(process.env.PUBLIC_URL + `/clips/${track}.mp3`, {
             responseType: "arraybuffer",
           })
           .then((result) => {
