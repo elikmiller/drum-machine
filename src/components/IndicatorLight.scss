@@ -1,0 +1,13 @@
+.indicatorLight {
+  background-color: #202020;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  height: 8px;
+  width: 24px;
+  border-radius: 2px;
+
+  &.indicatorLight-active {
+    background-color: #06ff6e;
+  }
+}

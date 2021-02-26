@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import PatternGrid from "./PatternGrid";
 import PlayButton from "./PlayButton";
 import TempoControl from "./TempoControl";
 import DrumMachine from "../DrumMachine";
+import TrackArray from "./TrackArray";
+import InstrumentSelect from "./InstrumentSelect";
 
 const DrumMachineContainer = () => {
   const drumMachine = useRef(null);
@@ -11,6 +12,7 @@ const DrumMachineContainer = () => {
   const [lastNotePlayed, setLastNotePlayed] = useState(null);
   const [pattern, setPattern] = useState({});
   const [loading, setLoading] = useState(true);
+  const [currentTrack, setCurrentTrack] = useState("clap");
 
   useEffect(() => {
     drumMachine.current = new DrumMachine({
@@ -75,7 +77,117 @@ const DrumMachineContainer = () => {
           <div uk-spinner={"true"}></div>
         </div>
       ) : (
-        <PatternGrid pattern={pattern} lastNotePlayed={lastNotePlayed} isPlaying={isPlaying} toggleNote={toggleNote} />
+        <>
+          <div className="uk-background-secondary uk-light uk-padding-large">
+            <div style={{ display: "flex" }}>
+              <div
+                style={{
+                  flex: "1 1 0",
+                  border: "1px solid rgba(255, 255, 255, 0.75)",
+                  borderRadius: "2px",
+                  padding: "1em",
+                }}
+              >
+                <InstrumentSelect tracks={Object.keys(pattern)} value={currentTrack} onChange={setCurrentTrack} />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flex: "2 1 0",
+                  border: "1px solid rgba(255, 255, 255, 0.75)",
+                  borderRadius: "2px",
+                }}
+              >
+                <div
+                  style={{
+                    flex: "1 1 0",
+                    border: "1px solid rgba(255, 255, 255, 0.75)",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    flex: "1 1 0",
+                    border: "1px solid rgba(255, 255, 255, 0.75)",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    flex: "1 1 0",
+                    border: "1px solid rgba(255, 255, 255, 0.75)",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    flex: "1 1 0",
+                    border: "1px solid rgba(255, 255, 255, 0.75)",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    flex: "1 1 0",
+                    border: "1px solid rgba(255, 255, 255, 0.75)",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    flex: "1 1 0",
+                    border: "1px solid rgba(255, 255, 255, 0.75)",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    flex: "1 1 0",
+                    border: "1px solid rgba(255, 255, 255, 0.75)",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    flex: "1 1 0",
+                    border: "1px solid rgba(255, 255, 255, 0.75)",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    flex: "1 1 0",
+                    border: "1px solid rgba(255, 255, 255, 0.75)",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    flex: "1 1 0",
+                    border: "1px solid rgba(255, 255, 255, 0.75)",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    flex: "1 1 0",
+                    border: "1px solid rgba(255, 255, 255, 0.75)",
+                    borderRadius: "2px",
+                  }}
+                />
+              </div>
+            </div>
+
+            <TrackArray
+              trackName={currentTrack}
+              trackNotes={pattern[currentTrack]}
+              lastNotePlayed={lastNotePlayed}
+              isPlaying={isPlaying}
+              toggleNote={toggleNote}
+            />
+          </div>
+          {/* <PatternGrid pattern={pattern} lastNotePlayed={lastNotePlayed} isPlaying={isPlaying} toggleNote={toggleNote} /> */}
+        </>
       )}
     </>
   );

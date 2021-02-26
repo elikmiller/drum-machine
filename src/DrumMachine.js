@@ -139,8 +139,6 @@ class DrumMachine {
 
     this.isPlaying = !this.isPlaying;
 
-    console.log(this.isPlaying);
-
     if (this.isPlaying) {
       this.current16thNote = 0;
       this.nextNoteTime = this.audioContext.currentTime + 0.1;

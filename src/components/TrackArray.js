@@ -6,17 +6,21 @@ const TrackArray = ({ trackName, trackNotes, lastNotePlayed, isPlaying, toggleNo
     <div
       style={{
         display: "flex",
-        justifyContent: "center",
+        justifyContent: "space-between",
         alignItems: "center",
-        marginTop: "10px",
-        padding: "5px",
+        padding: "16px",
         border: "1px solid rgba(255, 255, 255, 0.75)",
         borderRadius: "4px",
       }}
     >
-      <div style={{ minWidth: "96px" }}>{trackName}</div>
       {trackNotes.map((note, i) => (
-        <NoteToggleButton key={i} isActive={note} isPlaying={(i + 1) % 16 === lastNotePlayed} onClick={() => toggleNote(trackName, i)} />
+        <NoteToggleButton
+          key={i}
+          index={i}
+          isActive={note}
+          isPlaying={(i + 1) % 16 === lastNotePlayed}
+          onClick={() => toggleNote(trackName, i)}
+        />
       ))}
     </div>
   );

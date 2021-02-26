@@ -1,0 +1,42 @@
+.noteToggleButton {
+  position: relative;
+  box-sizing: border-box;
+  border: none;
+  height: 48px;
+  width: 32px;
+  border-radius: 2px;
+  cursor: pointer;
+
+  &-red {
+    background-color: #dc3931;
+  }
+
+  &-orange {
+    background-color: #ec9a29;
+  }
+
+  &-yellow {
+    background-color: #f3cc59;
+  }
+
+  &-white {
+    background-color: #d1ceb4;
+  }
+
+  &-playing {
+    animation: flash-animation 0ms;
+  }
+
+  &:hover {
+    box-shadow: 0 0 0 2px #f0f0f0;
+  }
+}
+
+@keyframes flash-animation {
+  from {
+    background: #1e87f0;
+  }
+  to {
+    background: default;
+  }
+}
