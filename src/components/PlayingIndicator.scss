@@ -1,0 +1,27 @@
+.PlayingIndicator {
+  background-color: #463c3c;
+  height: 16px;
+  width: 16px;
+  border-radius: 100%;
+  text-align: center;
+  margin: 8px;
+
+  &-playing {
+    animation: flash 100ms ease 0s 1 normal none;
+  }
+}
+
+@keyframes flash {
+  0% {
+    background-color: #463c3c;
+  }
+  5% {
+    background-color: red;
+  }
+  50% {
+    background-color: red;
+  }
+  100% {
+    background-color: #463c3c;
+  }
+}
