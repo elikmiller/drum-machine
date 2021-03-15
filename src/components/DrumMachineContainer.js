@@ -7,12 +7,20 @@ import InstrumentSelect from "./InstrumentSelect";
 
 const DrumMachineContainer = () => {
   const drumMachine = useRef(null);
-  const [tempo, setTempo] = useState(80);
+  const [tempo, setTempo] = useState(JSON.parse(localStorage.getItem('tempo')) || 80);
   const [isPlaying, setIsPlaying] = useState(false);
   const [lastNotePlayed, setLastNotePlayed] = useState(null);
-  const [pattern, setPattern] = useState({});
+  const [pattern, setPattern] = useState(JSON.parse(localStorage.getItem('pattern')) || {});
   const [loading, setLoading] = useState(true);
   const [currentTrack, setCurrentTrack] = useState("clap");
+
+  useEffect(() => {
+    localStorage.setItem('pattern', JSON.stringify(pattern));
+  }, [pattern])
+
+  useEffect(() => {
+    localStorage.setItem('tempo', JSON.stringify(tempo));
+  }, [tempo])
 
   useEffect(() => {
     drumMachine.current = new DrumMachine({
@@ -31,12 +39,16 @@ const DrumMachineContainer = () => {
       onLoadingDone: () => {
         setLoading(false);
       },
+      pattern,
+      tempo
     });
     setTempo(drumMachine.current.tempo);
     setIsPlaying(drumMachine.current.isPlaying);
     setLastNotePlayed(drumMachine.current.current16thNote);
     setPattern(drumMachine.current.pattern);
   }, []);
+
+  
 
   useEffect(() => {
     const togglePlaybackOnSpacebarPress = (e) => {
